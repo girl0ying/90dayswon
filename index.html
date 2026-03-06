@@ -347,15 +347,37 @@ function getLevel(x) {
   return levels.find(l => x < l.next) || levels[5];
 }
 
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+}
+
 function loadState() {
   try {
     const s = localStorage.getItem(STORAGE_KEY);
-    if (s) { const d = JSON.parse(s); xp = d.xp||0; streak = d.streak||0; }
+    if (s) {
+      const d = JSON.parse(s);
+      xp = d.xp || 0;
+      streak = d.streak || 0;
+      if (d.date === todayStr()) {
+        subChecked = d.subChecked || {};
+        awardedKeys = d.awardedKeys || {};
+        mode = d.mode || 'normal';
+      }
+    }
   } catch {}
 }
 
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({xp, streak})); } catch {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      xp, streak,
+      date: todayStr(),
+      subChecked,
+      awardedKeys,
+      mode
+    }));
+  } catch {}
 }
 
 function showToast(msg) {
@@ -392,6 +414,7 @@ function switchTab(tab) {
 function setMode(m) {
   mode = m;
   subChecked = {}; awardedKeys = {};
+  saveState();
   // update buttons
   Object.keys(dayModes).forEach(k => {
     const btn = document.getElementById('btn-' + k);
@@ -551,6 +574,22 @@ function switchMonth(id) {
 // Init
 loadState();
 updateXPBar();
+// restore mode button highlight
+(function() {
+  Object.keys(dayModes).forEach(k => {
+    const btn = document.getElementById('btn-' + k);
+    const dm = dayModes[k];
+    if (k === mode) {
+      btn.style.borderColor = dm.border;
+      btn.style.background = dm.bg;
+      btn.style.color = dm.text;
+    } else {
+      btn.style.borderColor = 'transparent';
+      btn.style.background = 'rgba(255,255,255,0.05)';
+      btn.style.color = '#777';
+    }
+  });
+})();
 renderHabits();
 </script>
 
