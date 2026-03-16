@@ -187,6 +187,7 @@
   <div class="header">
     <div class="header-title">⚔️ 90 วันปรับนิสัยเปลี่ยนชีวิต</div>
     <div class="header-sub">Atomic Habit Game Plan — 90 วัน</div>
+    <div id="month-badge" style="display:inline-block;margin-top:8px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid;"></div>
   </div>
 
   <div class="xp-bar-box">
@@ -198,8 +199,8 @@
           <div class="xp-label">XP รวม</div>
         </div>
         <div class="xp-num">
-          <div class="streak-val" id="streak-display">🔥 0</div>
-          <div class="xp-label">Streak วัน</div>
+          <div class="streak-val" id="streak-display">📅 วันที่ 1</div>
+          <div class="xp-label">วันที่ใน Quest</div>
         </div>
       </div>
     </div>
@@ -291,26 +292,83 @@ const months = [
   { id:3, label:'เดือน 3', theme:'เก็บเกี่ยว',    color:'#E05C00', emoji:'🏆', focus:['เตรียมสอบ CPC','CV ภาษาอังกฤษ','สมัครงาน remote แรก'] },
 ];
 
-const habits = {
-  english: {
-    label:'🇬🇧 ภาษาอังกฤษ', color:'#6C63FF',
-    fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['เรียน Duolingo 20 นาที','ดู YouTube medical English 20 นาที','จดคำศัพท์ใหม่ 10 คำ'] },
-    normal:{ label:'ปกติ 😊',    xp:20, subtasks:['เรียน Duolingo 15 นาที','ฟัง podcast ภาษาอังกฤษ 10 นาที'] },
-    tired: { label:'เหนื่อย 😴', xp:10, subtasks:['เปิด Duolingo 1 lesson (5 นาที)'] },
+// Tasks แยกตาม 3 เดือน สอดคล้อง Roadmap
+const habitsByMonth = {
+  1: { // เดือน 1: วางรากฐาน
+    english: {
+      label:'🇬🇧 ภาษาอังกฤษ', color:'#6C63FF',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['เรียน Duolingo 20 นาที','ดู YouTube medical English 20 นาที','จดคำศัพท์ใหม่ 10 คำ'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['เรียน Duolingo 15 นาที','ฟัง podcast ภาษาอังกฤษ 10 นาที'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['เปิด Duolingo 1 lesson (5 นาที)'] },
+    },
+    coding: {
+      label:'🇺🇸 US Medical Coding', color:'#00B4A0',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['ศึกษาความต่าง ICD-10 ไทย vs สหรัฐฯ','อ่านเว็บ AAPC ว่าสอบ CPC ต้องเตรียมอะไร','จด checklist สิ่งที่ต้องเรียนเพิ่ม'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['อ่านบทความ CPC/CCS certificate 30 นาที','จดข้อมูลค่าสมัครและขั้นตอน'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['ดู YouTube แนะนำ US Medical Coding 10 นาที'] },
+    },
+    chinese: {
+      label:'🈶 ภาษาจีน / iTalki', color:'#E05C00',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['สมัคร iTalki และตั้งโปรไฟล์ให้ครบ','ฝึกพูดแนะนำตัวเองภาษาจีน 5 นาที','ทบทวน vocab HSK3 ที่ยังไม่แม่น 15 คำ'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['ทบทวน vocab HSK 10 คำ','ฟัง podcast จีน 10 นาที'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['ดู TikTok ภาษาจีน 5 คลิป (ฝึกฟัง)'] },
+    },
   },
-  coding: {
-    label:'🇺🇸 US Medical Coding', color:'#00B4A0',
-    fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['อ่าน CPT manual 1 chapter','ทำ practice quiz 20 ข้อ','จดสรุปความต่าง ICD-10 ไทย vs สหรัฐฯ'] },
-    normal:{ label:'ปกติ 😊',    xp:20, subtasks:['อ่าน CPT หรือ HCPCS 30 นาที','ทำ quiz 10 ข้อ'] },
-    tired: { label:'เหนื่อย 😴', xp:10, subtasks:['อ่านบทความ medical coding 1 เรื่อง (10 นาที)'] },
+  2: { // เดือน 2: สร้างโมเมนตัม
+    english: {
+      label:'🇬🇧 ภาษาอังกฤษ', color:'#6C63FF',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['เรียน Duolingo 20 นาที','ฝึกอ่าน medical text ภาษาอังกฤษ 20 นาที','จดศัพท์ medical ใหม่ 10 คำ'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['เรียน Duolingo 15 นาที','ฟัง medical podcast ภาษาอังกฤษ 10 นาที'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['เปิด Duolingo 1 lesson (5 นาที)'] },
+    },
+    coding: {
+      label:'🇺🇸 CPT / HCPCS Coding', color:'#00B4A0',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['อ่าน CPT manual 1 chapter','ทำ practice quiz CPT 20 ข้อ','จดความต่าง CPT vs ICD-10'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['อ่าน CPT หรือ HCPCS 30 นาที','ทำ quiz 10 ข้อ'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['อ่านบทความ US coding guide 10 นาที'] },
+    },
+    chinese: {
+      label:'🈶 ภาษาจีน / สอนออนไลน์', color:'#E05C00',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['สอน/ฝึกสอน iTalki 1 ครั้ง','เรียน HSK4 vocab 15 คำ','เขียนสรุปบทเรียนภาษาจีน'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['ทบทวน HSK4 vocab 10 คำ','ฟัง podcast จีน 10 นาที'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['ดู TikTok / Douyin ภาษาจีน 5 คลิป'] },
+    },
   },
-  chinese: {
-    label:'🈶 ภาษาจีน / iTalki', color:'#E05C00',
-    fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['ฝึกพูดบันทึกเสียง 5 นาที','เรียน HSK4 vocab 15 คำ','เขียนสรุปบทเรียนภาษาจีน'] },
-    normal:{ label:'ปกติ 😊',    xp:20, subtasks:['ทบทวน vocab HSK 10 คำ','ฟัง podcast จีน 10 นาที'] },
-    tired: { label:'เหนื่อย 😴', xp:10, subtasks:['ดู TikTok ภาษาจีน 5 คลิป (ฝึกฟัง)'] },
+  3: { // เดือน 3: เก็บเกี่ยว
+    english: {
+      label:'🇬🇧 ภาษาอังกฤษ', color:'#6C63FF',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['ฝึกเขียน CV ภาษาอังกฤษ 1 ส่วน','เรียน Duolingo 20 นาที','ฝึกตอบ interview คำถามภาษาอังกฤษ'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['เรียน Duolingo 15 นาที','ฝึกอ่านประกาศรับสมัครงาน remote'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['เปิด Duolingo 1 lesson (5 นาที)'] },
+    },
+    coding: {
+      label:'🇺🇸 เตรียมสอบ CPC', color:'#00B4A0',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['ทำ mock exam CPC 30 ข้อ','ทบทวนข้อที่ผิด','อ่าน coding guideline 1 หัวข้อ'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['ทำ practice quiz CPC 20 ข้อ','จดสรุปจุดที่ยังสับสน'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['ทบทวน flashcard coding 10 นาที'] },
+    },
+    chinese: {
+      label:'🈶 ภาษาจีน / หารายได้', color:'#E05C00',
+      fire:  { label:'ไฟแรง 🔥',   xp:30, subtasks:['สอน iTalki 1 ครั้ง (รับเงินจริง)','เรียน HSK4 vocab 15 คำ','สร้างสื่อการสอน 1 ชิ้น'] },
+      normal:{ label:'ปกติ 😊',    xp:20, subtasks:['ทบทวน HSK4 vocab 10 คำ','วางแผนคลาสสัปดาห์หน้า'] },
+      tired: { label:'เหนื่อย 😴', xp:10, subtasks:['ดู Douyin ภาษาจีน 5 คลิป'] },
+    },
   },
 };
+
+// คำนวณเดือนปัจจุบันจากวันที่เริ่ม
+function getCurrentMonth() {
+  const startDate = localStorage.getItem('quest_start_date');
+  if (!startDate) return 1;
+  const diff = Math.floor((new Date() - new Date(startDate)) / (1000*60*60*24));
+  if (diff < 30) return 1;
+  if (diff < 60) return 2;
+  return 3;
+}
+
+function getHabits() {
+  return habitsByMonth[getCurrentMonth()];
+}
 
 const rewards = [
   { xp:100,  label:'🌟 ดาวเริ่มต้น',        reward:'ซื้อขนมหรือกาแฟชนิดโปรด 1 อย่าง' },
@@ -338,7 +396,7 @@ const dayModes = {
 };
 
 // State
-let xp = 0, streak = 0, mode = 'normal';
+let xp = 0, dayCount = 0, mode = 'normal';
 let subChecked = {}, awardedKeys = {};
 let activeMonth = 1, activeTab = 'today';
 let toastTimer = null;
@@ -354,24 +412,34 @@ function todayStr() {
 
 function loadState() {
   try {
+    // ตั้งวันเริ่มต้น ถ้ายังไม่มี
+    if (!localStorage.getItem('quest_start_date')) {
+      localStorage.setItem('quest_start_date', todayStr());
+    }
     const s = localStorage.getItem(STORAGE_KEY);
     if (s) {
       const d = JSON.parse(s);
       xp = d.xp || 0;
-      streak = d.streak || 0;
+      // คำนวณ dayCount จากวันเริ่มต้น
+      const start = new Date(localStorage.getItem('quest_start_date'));
+      dayCount = Math.floor((new Date() - start) / (1000*60*60*24)) + 1;
       if (d.date === todayStr()) {
         subChecked = d.subChecked || {};
         awardedKeys = d.awardedKeys || {};
         mode = d.mode || 'normal';
       }
+    } else {
+      dayCount = 1;
     }
+    // set activeMonth ตามวันปัจจุบัน
+    activeMonth = getCurrentMonth();
   } catch {}
 }
 
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      xp, streak,
+      xp,
       date: todayStr(),
       subChecked,
       awardedKeys,
@@ -393,10 +461,15 @@ function updateXPBar() {
   const pct = Math.min(100, ((xp - prev) / (lv.next - prev)) * 100);
   document.getElementById('lv-badge').textContent = 'Lv.' + lv.lv + ' ' + lv.title;
   document.getElementById('xp-display').textContent = xp.toLocaleString();
-  document.getElementById('streak-display').textContent = '🔥 ' + streak;
+  document.getElementById('streak-display').textContent = '📅 วันที่ ' + dayCount;
   document.getElementById('xp-fill').style.width = pct + '%';
   document.getElementById('xp-cur').textContent = xp + ' XP';
   document.getElementById('xp-next').textContent = 'ต่อไป ' + lv.next + ' XP';
+  // แสดงเดือนปัจจุบัน
+  const curMonth = getCurrentMonth();
+  const mInfo = [{color:'#6C63FF',label:'เดือน 1 🌱 วางรากฐาน'},{color:'#00B4A0',label:'เดือน 2 🔥 สร้างโมเมนตัม'},{color:'#E05C00',label:'เดือน 3 🏆 เก็บเกี่ยว'}][curMonth-1];
+  const badge = document.getElementById('month-badge');
+  if (badge) { badge.textContent = mInfo.label; badge.style.background = mInfo.color + '33'; badge.style.color = mInfo.color; badge.style.borderColor = mInfo.color + '66'; }
 }
 
 function switchTab(tab) {
@@ -435,6 +508,7 @@ function setMode(m) {
 function toggleSub(habitKey, idx) {
   const sk = habitKey + '-' + idx;
   subChecked[sk] = !subChecked[sk];
+  const habits = getHabits();
   const task = habits[habitKey][mode];
   const total = task.subtasks.length;
   const done = task.subtasks.filter((_,i) => subChecked[habitKey+'-'+i]).length;
@@ -445,12 +519,12 @@ function toggleSub(habitKey, idx) {
   if (allDone && !wasAwarded) {
     xp += task.xp;
     awardedKeys[habitKey] = true;
+    const habits = getHabits();
     const allHabitsDone = Object.keys(habits).every(k => !!awardedKeys[k]);
-    if (allHabitsDone) streak++;
     saveState(); updateXPBar();
     const unlocked = rewards.find(r => r.xp <= xp && r.xp > prevXp);
     if (unlocked) showToast('🎉 ปลดล็อค: ' + unlocked.label + '!\n' + unlocked.reward);
-    else if (allHabitsDone) showToast('🔥 ครบทุก task! Streak: ' + streak + ' วัน');
+    else if (allHabitsDone) showToast('🔥 ครบทุก task วันที่ ' + dayCount + '! ยอดเยี่ยมมาก!');
     else showToast('✅ ' + task.subtasks.length + ' ข้อครบ! +' + task.xp + ' XP');
   } else if (!allDone && wasAwarded) {
     xp = Math.max(0, xp - task.xp);
@@ -463,6 +537,7 @@ function toggleSub(habitKey, idx) {
 function renderHabits() {
   const container = document.getElementById('habit-cards');
   const dm = dayModes[mode];
+  const habits = getHabits();
   container.innerHTML = Object.entries(habits).map(([key, h]) => {
     const task = h[mode];
     const awarded = !!awardedKeys[key];
@@ -545,7 +620,8 @@ function renderRoadmap() {
     </div>`;
 
   const dmList = ['fire','normal','tired'];
-  document.getElementById('roadmap-habits').innerHTML = Object.entries(habits).map(([key,h]) =>
+  const roadmapHabits = habitsByMonth[activeMonth];
+  document.getElementById('roadmap-habits').innerHTML = Object.entries(roadmapHabits).map(([key,h]) =>
     `<div class="roadmap-habit-card">
       <div class="roadmap-habit-title" style="color:${h.color}">${h.label}</div>
       ${dmList.map(lvl => {
